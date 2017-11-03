@@ -1,0 +1,3 @@
+Put your models here! We're only supporting obj for now.
+
+Also, did you remember to add credits to CREDITS?
