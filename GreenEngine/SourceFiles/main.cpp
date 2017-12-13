@@ -3,11 +3,11 @@
 #include "GlobalPrefs.h"
 #include "InputEngine.h"
 #include "MessagingSystem.h"
+#include "SoundEngine.h"
 
 SDL_Window *g_window_p;
 SDL_GLContext g_context;
 std::thread* engineThread_p;
-
 
 /// <summary>
 /// Application entry point
@@ -15,10 +15,11 @@ std::thread* engineThread_p;
 /// <param name="argc">Number of arguments passed to the application</param>
 /// <param name="argv">Array containg string arguments passed to the application</param>
 /// <return>Status code on application exit.</return>
-int main(int argc, char ** argv) {
+	int main(int argc, char ** argv) {
 	SDL_Init(SDL_INIT_VIDEO);
 	//open opengl and window
 	InputEngine *ie = new InputEngine();
+	SoundEngine *se = new SoundEngine();
 	g_window_p = SDL_CreateWindow("RACE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GlobalPrefs::windowWidth, GlobalPrefs::windowHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
 
 	// game code eventually goes here
@@ -29,6 +30,13 @@ int main(int argc, char ** argv) {
 	MessagingSystem::instance().start();
 	Engine *e = new Engine();
 	engineThread_p = e->start();
+
+	SoundMessageContent *content = new SoundMessageContent;
+	content->name = "Music02";
+	content->subType = S_TYPE::playMusic;
+	std::shared_ptr<Message> myMessage = std::make_shared<Message>(Message(MESSAGE_TYPE::SoundMessageType));
+	myMessage->setContent(content);
+	MessagingSystem::instance().postMessage(myMessage);
 
 	//*****temporary loop stolen from racerender
 
@@ -47,9 +55,42 @@ int main(int argc, char ** argv) {
 				quit = true;
 				break;
 			case SDL_CONTROLLERBUTTONDOWN:
-				ie->buttonEventHandler(ev);
+			case SDL_CONTROLLERBUTTONUP:
+				InputButtonDownContent *content = new InputButtonDownContent();
+				content->ev = ev;
+				std::shared_ptr<Message> myMessage = std::make_shared<Message>(Message(MESSAGE_TYPE::InputButtonDownCallType));
+				myMessage->setContent(content);
+				MessagingSystem::instance().postMessage(myMessage);
 				break;
 		}
+
+		/*if (ev.type == SDL_KEYDOWN)
+		{
+			switch (ev.key.keysym.sym)
+			{
+				case SDLK_0:
+				{
+					
+				}
+				break;
+
+				case SDLK_1:
+				{
+					SoundMessageContent *content = new SoundMessageContent;
+					content->subType = S_TYPE::stopMusic;
+					std::shared_ptr<Message> myMessage = std::make_shared<Message>(Message(MESSAGE_TYPE::SoundMessageType));
+					myMessage->setContent(content);
+					MessagingSystem::instance().postMessage(myMessage);
+				}
+					break;
+
+				case SDLK_2:
+				{
+					
+				}
+					break;
+			}
+		}*/
 
 		//run the renderer every tick
 		/*uint32_t ticksSinceLast = SDL_GetTicks() - ticksAtLast;
@@ -57,6 +98,8 @@ int main(int argc, char ** argv) {
 		{
 			//e->update();
 		}*/
+
+		se->loop();
 	}
 
 	
@@ -74,7 +117,7 @@ int main(int argc, char ** argv) {
 
 	//*****temporary loop section ends
 
-	SDL_Quit();
+	delete(se);
 
 	return 0;
 }

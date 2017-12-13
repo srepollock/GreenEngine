@@ -29,6 +29,16 @@ std::string Shaders::VSH_01_PATH = "ResourceFiles/Shaders/shader01.vsh";
 std::string Shaders::FSH_01_PATH = "ResourceFiles/Shaders/shader01.fsh";
 std::string Shaders::VSH_02_PATH = "ResourceFiles/Shaders/shader02.vsh";
 std::string Shaders::FSH_02_PATH = "ResourceFiles/Shaders/shader02.fsh";
+std::string Shaders::VSH_SHADOW_PATH = "ResourceFiles/Shaders/shadow.vsh";
+std::string Shaders::FSH_SHADOW_PATH = "ResourceFiles/Shaders/shadow.fsh";
+std::string Shaders::VSH_POINT_PATH = "ResourceFiles/Shaders/light_point.vsh";
+std::string Shaders::FSH_POINT_PATH = "ResourceFiles/Shaders/light_point.fsh";
+std::string Shaders::VSH_SPOT_PATH = "ResourceFiles/Shaders/light_spot.vsh";
+std::string Shaders::FSH_SPOT_PATH = "ResourceFiles/Shaders/light_spot.fsh";
+std::string Shaders::VSH_POST_PATH = "ResourceFiles/Shaders/postprocessing.vsh";
+std::string Shaders::FSH_POST_PATH = "ResourceFiles/Shaders/postprocessing.fsh";
+std::string Shaders::VSH_COPY_PATH = "ResourceFiles/Shaders/sbcopy.vsh";
+std::string Shaders::FSH_COPY_PATH = "ResourceFiles/Shaders/sbcopy.fsh";
 
 /*----------------------------------------------------------------------------------------
 	Class Methods
@@ -38,58 +48,7 @@ std::string Shaders::FSH_02_PATH = "ResourceFiles/Shaders/shader02.fsh";
 ///
 GLuint Shaders::LoadShaders()
 {
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	//glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	std::string vsh = FileHelper::loadFileFromString(Shaders::VSH_01_PATH);
-	const char* vshContent = vsh.c_str();
-	glShaderSource(vertexShader, 1, &(vshContent), NULL);
-	glCompileShader(vertexShader);
-
-	// check for shader compile errors
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-		SDL_Log("%s", infoLog);
-	}
-
-	// fragment shader
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	//glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	std::string fsh = FileHelper::loadFileFromString(Shaders::FSH_01_PATH);
-	const char* fshContent = fsh.c_str();
-	glShaderSource(fragmentShader, 1, &(fshContent), NULL);
-	glCompileShader(fragmentShader);
-
-	// check for shader compile errors
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-		SDL_Log("%s", infoLog);
-	}
-
-	// link shaders
-	GLuint shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	// check for linking errors
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-		SDL_Log("%s", infoLog);
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	return shaderProgram;
+	return Shaders::LoadShadersGeneric(Shaders::VSH_01_PATH, Shaders::FSH_01_PATH);
 }
 
 ///
@@ -97,9 +56,56 @@ GLuint Shaders::LoadShaders()
 ///
 GLuint Shaders::LoadShadersFBDraw()
 {
+	return Shaders::LoadShadersGeneric(Shaders::VSH_02_PATH, Shaders::FSH_02_PATH);
+}
+
+///
+///
+///
+GLuint Shaders::LoadShadersShadows()
+{
+	return Shaders::LoadShadersGeneric(Shaders::VSH_SHADOW_PATH, Shaders::FSH_SHADOW_PATH);
+}
+
+///
+///
+///
+GLuint Shaders::LoadShadersPointPass()
+{
+	return Shaders::LoadShadersGeneric(Shaders::VSH_POINT_PATH, Shaders::FSH_POINT_PATH);
+}
+
+///
+///
+///
+GLuint Shaders::LoadShadersSpotPass()
+{
+	return Shaders::LoadShadersGeneric(Shaders::VSH_SPOT_PATH, Shaders::FSH_SPOT_PATH);
+}
+
+///
+///
+///
+GLuint Shaders::LoadShadersPostProcessing()
+{
+	return Shaders::LoadShadersGeneric(Shaders::VSH_POST_PATH, Shaders::FSH_POST_PATH);
+}
+
+///
+///
+///
+GLuint Shaders::LoadShadersSBCopy()
+{
+	return Shaders::LoadShadersGeneric(Shaders::VSH_COPY_PATH, Shaders::FSH_COPY_PATH);
+}
+
+///
+///
+///
+GLuint Shaders::LoadShadersGeneric(std::string vshPath, std::string fshPath)
+{
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	//glShaderSource(vertexShader, 1, &(Shaders::vertexShader2Source), NULL);
-	std::string vsh = FileHelper::loadFileFromString(Shaders::VSH_02_PATH);
+	std::string vsh = FileHelper::loadFileFromString(vshPath);
 	const char* vshContent = vsh.c_str();
 	glShaderSource(vertexShader, 1, &(vshContent), NULL);
 	glCompileShader(vertexShader);
@@ -117,8 +123,7 @@ GLuint Shaders::LoadShadersFBDraw()
 
 	// fragment shader
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	//glShaderSource(fragmentShader, 1, &fragmentShader2Source, NULL);
-	std::string fsh = FileHelper::loadFileFromString(Shaders::FSH_02_PATH);
+	std::string fsh = FileHelper::loadFileFromString(fshPath);
 	const char* fshContent = fsh.c_str();
 	glShaderSource(fragmentShader, 1, &(fshContent), NULL);
 	glCompileShader(fragmentShader);
@@ -128,7 +133,6 @@ GLuint Shaders::LoadShadersFBDraw()
 	if (!success)
 	{
 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
 		SDL_Log("%s", infoLog);
 	}
 
@@ -142,7 +146,6 @@ GLuint Shaders::LoadShadersFBDraw()
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
 		SDL_Log("%s", infoLog);
 	}
 	glDeleteShader(vertexShader);

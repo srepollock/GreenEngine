@@ -6,7 +6,6 @@
 ///
 #include "Vector3.h"
 #include "Component.h"
-#include "AccelerationComponent.h"
 #include "AIComponent.h"
 #include "AudioComponent.h"
 #include "BoxColliderComponent.h"
@@ -19,4 +18,3 @@
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "RigidBodyComponent.h"
-#include "VelocityComponent.h"

@@ -3,6 +3,13 @@
 #include <string>
 #include <exception>
 #include <vector>
+#ifndef FILE_CONSTANTS
+#define FILE_CONSTANTS
+const std::string MODEL_BASEPATH_CONST = "ResourceFiles/Models/";
+const std::string TEXTURE_BASEPATH_CONST = "ResourceFiles/Textures/";
+const std::string MODEL_EXTENSION_CONST = ".obj";
+const std::string TEXTURE_EXTENSION_CONST = ".png";
+#endif
 
 /// <summary>
 /// Static helper class that wraps some SDL file operations

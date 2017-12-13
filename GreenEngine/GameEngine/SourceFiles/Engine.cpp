@@ -2,10 +2,11 @@
 #include "ErrorHandler.h"
 #include <typeinfo>
 
-const int FRAMES_PER_SECOND = 60;
+const int FRAMES_PER_SECOND = 120;
+
 
 Engine::Engine() {
-    
+	
 };
 
 Engine::~Engine() {
@@ -13,7 +14,8 @@ Engine::~Engine() {
 };
 
 std::thread* Engine::start() {
-	
+	subscribe(MESSAGE_TYPE::PhysicsReturnCall);
+	subscribe(MESSAGE_TYPE::SceneDoneLoadType);
     // Create the other engines, or at least get pointer to them
 	_fileEngine_p = new FileEngine();
 	if (_fileEngine_p == nullptr) {
@@ -27,14 +29,14 @@ std::thread* Engine::start() {
     if (_physicsEngine_p == nullptr) {
         std::cout << ErrorHandler::getErrorString(1) << std::endl;
     }
+	_inputEngine_p = new InputEngine();
+	if (_inputEngine_p == nullptr) {
+		std::cout << ErrorHandler::getErrorString(1) << std::endl;
+	}
     /**_aiEngine_p = new AIEngine();
     if (_aiEngine_p == nullptr) {
         std::cout << ErrorHandler::getErrorString(1) << std::endl;
     }**/
-    _inputEngine_p = new InputEngine();
-    if (_inputEngine_p == nullptr) {
-        std::cout << ErrorHandler::getErrorString(1) << std::endl;
-    }
     _soundEngine_p = new SoundEngine();
 
     if (_soundEngine_p == nullptr) {
@@ -45,7 +47,7 @@ std::thread* Engine::start() {
         _renderEngine_p->start(); // Render handles it's own thread
         _physicsThread_p = _physicsEngine_p->start();
         //_aiThread_p = _aiEngine_p->start();
-        _soundEngine_p->start();		
+        //_soundEngine_p->start();		
     } catch (std::exception e) {
         std::cout << ErrorHandler::getErrorString(1) << std::endl;
     }
@@ -59,18 +61,26 @@ std::thread* Engine::start() {
     }
 
 	_sceneObj = new Scene();
+	while (checkMessages());
+	_inputEngine_p->setUpInput();
 
 	ticksAtLast = SDL_GetTicks();
 
 	RenderLoadMessageContent *rlmc = new RenderLoadMessageContent();
 	RenderableSetupData rsd;
-	rsd.models.push_back("cube");
-	rsd.models.push_back("sphere");
-	rsd.models.push_back("road_floor");
 	rsd.models.push_back("carModel");
-	rsd.textures.push_back("rainbow");
-	rsd.textures.push_back("test_texture");
-	rsd.textures.push_back("test_texture2");
+	rsd.models.push_back("car2_body");
+	rsd.models.push_back("car2_wheel");
+	rsd.models.push_back("cone");
+	rsd.models.push_back("track2a");
+	rsd.models.push_back("track3b");
+	rsd.models.push_back("cube");
+	rsd.textures.push_back("car2_base");
+	rsd.textures.push_back("car2_wheel");
+	rsd.textures.push_back("grass");
+	rsd.textures.push_back("grass2_d");
+	rsd.textures.push_back("grass2_n");
+	rsd.textures.push_back("asphalt");
 	rsd.textures.push_back("test_texture3");
 	rlmc->data = rsd;
 
@@ -87,28 +97,22 @@ void Engine::update() {
 	uint32_t currentTime = SDL_GetTicks();
 	if (currentTime > ticksAtLast + 1000 / FRAMES_PER_SECOND)
 	{
-		_inputEngine_p->checkInput();
-
-		//SDL_Log("Ticked");
+		float delta = (((float_t)(currentTime - ticksAtLast)) / 1000);
+		_inputEngine_p->checkInput(delta);
 		if (_sceneObj != nullptr) {
-			PhysicsCallMessageContent *physicsContent = new PhysicsCallMessageContent("Test");
-			physicsContent->worldObjects = _sceneObj->_worldObjects;
-			physicsContent->deltaTime = (((float_t)(currentTime - ticksAtLast)) / 1000);
-			std::shared_ptr<Message> myMessage = std::make_shared<Message>(Message(MESSAGE_TYPE::PhysicsCallMessageType));
-			myMessage->setContent(physicsContent);
-			MessagingSystem::instance().postMessage(myMessage);
 
-			RenderDrawMessageContent *renderContent = new RenderDrawMessageContent();
-			renderContent->scene_p = _sceneObj->getRenderInformation();
-
-			std::shared_ptr<Message> msg = std::make_shared<Message>(Message(MESSAGE_TYPE::RenderDrawMessageType, false));
-			msg->setContent(renderContent);
-			MessagingSystem::instance().postMessage(msg);
+			doWrites(delta);
+			while (checkMessages()) {
+				std::this_thread::yield();
+			}
+			doReads();
 		}
 		
 		ticksAtLast = currentTime;
 	}
-	//SDL_Log("%s", "Running Engine::udpate");
+	else {
+		std::this_thread::yield();
+	}
 }
 
 void Engine::loop() {
@@ -119,16 +123,7 @@ void Engine::loop() {
 	}
 	while (_running) 
 	{
-		//SDL_Log("This one should work");
-
 		this->update();
-
-		//SDL_Log("Doing a stupid befpre!");
-
-		//std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-
-		//SDL_Log("Doing a stupid!");
-
 	}
 	this->stop();
 };
@@ -144,8 +139,6 @@ void Engine::loop() {
 /// 
 void Engine::stop() 
 {
-	//SDL_Log("Engine::stop");
-	_soundEngine_p->~SoundEngine();
 	_inputEngine_p->~InputEngine();
 	//_aiEngine_p->~AIEngine();
 	_physicsEngine_p->flagLoop();
@@ -163,4 +156,68 @@ void Engine::stop()
 void Engine::flagLoop() 
 {
 	_running = false;
+}
+
+bool Engine::checkMessages()
+{
+	_urgentMessageQueueMutex_p->lock();
+	_messageQueueMutex_p->lock();
+	if (_messageQueue.empty() && _urgentMessageQueue.empty())
+	{
+		_urgentMessageQueueMutex_p->unlock();
+		_messageQueueMutex_p->unlock();
+	}
+	else {
+		if (!_urgentMessageQueue.empty())
+		{
+			_messageQueueMutex_p->unlock();
+			// process an urgent message
+			if (_urgentMessageQueue.front()->getType() == MESSAGE_TYPE::PhysicsReturnCall) {
+				_urgentMessageQueueMutex_p->unlock();
+				_urgentMessageQueue.pop();
+				return false;
+			}
+			_urgentMessageQueueMutex_p->unlock();
+		}
+		else
+		{
+			_urgentMessageQueueMutex_p->unlock();
+			if (!_messageQueue.empty())
+			{
+				// process a normal messages
+				if (_messageQueue.front()->getType() == MESSAGE_TYPE::PhysicsReturnCall) {
+					_messageQueueMutex_p->unlock();
+					_messageQueue.pop();
+					return false;
+				}
+				if (_messageQueue.front()->getType() == MESSAGE_TYPE::SceneDoneLoadType) {
+					_messageQueueMutex_p->unlock();
+					_messageQueue.pop();
+					return false;
+				}
+			}
+			_messageQueueMutex_p->unlock();
+		}
+	}
+	
+	return true;
+}
+
+void Engine::doWrites(GLfloat delta)
+{
+	PhysicsCallMessageContent *physicsContent = new PhysicsCallMessageContent(std::to_string(count++));
+	physicsContent->worldObjects = _sceneObj->_worldObjects;
+	physicsContent->deltaTime = delta;
+	std::shared_ptr<Message> myMessage = std::make_shared<Message>(Message(MESSAGE_TYPE::PhysicsCallMessageType));
+	myMessage->setContent(physicsContent);
+	MessagingSystem::instance().postMessage(myMessage);
+}
+
+void Engine::doReads()
+{
+	RenderDrawMessageContent *renderContent = new RenderDrawMessageContent();
+	renderContent->scene_p = _sceneObj->getRenderInformation();
+	std::shared_ptr<Message> msg = std::make_shared<Message>(Message(MESSAGE_TYPE::RenderDrawMessageType, false));
+	msg->setContent(renderContent);
+	MessagingSystem::instance().postMessage(msg);
 }

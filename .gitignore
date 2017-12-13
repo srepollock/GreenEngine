@@ -266,3 +266,7 @@ __pycache__/
 *.swp
 *.out.dSYM/*
 /ResourceFiles/*
+
+race/ResourceFiles/Models/Blender/*.blend
+race/ResourceFiles/Models/Blender/*.blend1
+race/ResourceFiles/Models/Blender/*.jpg

@@ -11,11 +11,12 @@
 #include <string>
 #include <iostream>
 #include <thread>
+#include <mutex>
 #include "EngineHeaders.h"
 #include "ComponentHeaders.h"
 #include "GameObject.h"
 #include "Scene.h"
-class Engine {
+class Engine : public MessageReceiver {
 public:
     std::thread* start();
     Engine();
@@ -23,6 +24,9 @@ public:
     void update();
     void stop();
 	void flagLoop();
+	bool checkMessages();
+	void doWrites(GLfloat);
+	void doReads();
     std::thread *_engineThread_p;
 private:
 	FileEngine *_fileEngine_p;
@@ -38,6 +42,7 @@ private:
 	Scene* _sceneObj;
 	float i = 0;
 	uint32_t ticksAtLast = 0;
+	int count = 0;
     void loop();
 	
 };

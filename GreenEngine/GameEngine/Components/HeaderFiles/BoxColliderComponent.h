@@ -1,8 +1,11 @@
 #pragma once
 #include "ColliderComponent.h"
+#include "FileHelper.h"
+#include "OBJImport.h"
 class BoxColliderComponent : public ColliderComponent
 {
 public:
+	BoxColliderComponent(std::string filename);
 	void setMinX(int _x);
 	void setMinY(int _y);
 	void setMinZ(int _z);
@@ -18,4 +21,6 @@ public:
 private:
 	int _minX, _minY, _minZ;
 	int _maxX, _maxY, _maxZ;
+	void setValuesAllZero();
+	void buildBoxColliderFromOBJ(std::string filename);
 };

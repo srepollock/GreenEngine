@@ -23,5 +23,5 @@ public:
 	///
 	/// </summary>
 	static std::vector<GLfloat> importObjInfo(std::string string);
-
+	static std::vector<GLfloat> importObjInfoVertices(std::string string);
 };

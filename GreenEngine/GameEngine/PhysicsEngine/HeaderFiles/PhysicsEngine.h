@@ -32,9 +32,17 @@
 #include <thread>
 #include <math.h>
 #include "MessageReceiver.h"
+#include "../../MessagingSystem/HeaderFiles/MessagingSystem.h"
+#include "MessageTypes.h"
 #include "GameObject.h"
 #include "../../HeaderFiles/InputTypes.h"
 #include "../../Components/HeaderFiles/ComponentHeaders.h"
+
+#define RHO 1.225
+#define LINEARDRAGCOEF 0.5
+#define ANGULARDRAGCOEF 0.05
+#define GRAVITY -9.81
+
 
 /*========================================================================================
 	Dependencies
@@ -57,10 +65,11 @@ class PhysicsEngine : public MessageReceiver
     ------------------------------------------------------------------------------------*/
     private:
 		bool _running = false;
-		GameObject* _player_p;
-		GameObject* _camera_p;
 		GLfloat _deltaTime;
-		const float MATH_PI = 3.14159;
+		const float MATH_PI = 3.14159f;
+		float count = 0;
+		float rotationAccel = 0;
+		float _driftTimer = 0;
 
     /*------------------------------------------------------------------------------------
 		Constructors and Destructors
@@ -91,23 +100,19 @@ class PhysicsEngine : public MessageReceiver
 			void flagLoop();
 			// TODO: Physics function calls
 	#pragma region Physics Calculation Methods
-			void translate(GameObject *go, Vector3 translation);
-			void translate(GameObject *go, GLfloat x, GLfloat y, GLfloat z);
-			void translateForward(GameObject *go, Vector3 traslation);
-			void accelerate(GameObject *go, Vector3 amount);
+			void linearAccelerate(GameObject * obj, RigidBodyComponent * rbc);
+			void angularAccelerate(RigidBodyComponent * rbc);
 			void accelerate(GameObject *go, GLfloat x, GLfloat y, GLfloat z);
-			void decelerate(GameObject *go, Vector3 amount);
-			void decelerate(GameObject *go, GLfloat x, GLfloat y, GLfloat z);
-			void rotate(GameObject *go, Vector3 amount);
-			void rotateX(GameObject *go, GLfloat angle);
-			void rotateY(GameObject *go, GLfloat angle);
-			void rotateZ(GameObject *go, GLfloat angle);
 	#pragma endregion
 
     private:
 		void loop();
 		void checkMessage(std::shared_ptr<Message>);
-		void getControllerInput(InputMessageContent*);
-		void applyAcceleration(GameObject*);
 		void generalPhysicsCall(GameObject*);
+		void applyAcceleration(GameObject * go, RigidBodyComponent * rc);
+		void adjustForces(GameObject * go, RigidBodyComponent * rc);
+		Vector3 getAngleFromTurn(GameObject *go, GLfloat tireDegree);
+		void turnGameObject(GameObject *go);
+		void collisionDetection(std::map<std::string, GameObject*> worldObj, GameObject *go);
+		bool checkForCollision(GameObject *coll1, GameObject *coll2);
 };

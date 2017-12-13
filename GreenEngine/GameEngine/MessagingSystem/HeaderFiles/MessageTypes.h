@@ -41,10 +41,14 @@
 enum class MESSAGE_TYPE
 {
 	BaseMessageType,
+	PhysicsReturnCall,
 	PhysicsCallMessageType,
-	PhysicsInitializeCallType,
+	PhysicsAccelerateCallType,
+	InputInitializeCallType,
+	InputButtonDownCallType,
 	FileLoadMessageType,
 	InputMessageType,
+	SceneDoneLoadType,
 	FileLoadImageMessageType,
 	FileLoadedMessageType,
 	FileLoadedImageMessageType,
@@ -54,7 +58,8 @@ enum class MESSAGE_TYPE
 	RenderDrawMessageType,
 	RenderDrawOverlayMessageType,
 	RenderUnloadMessageType,
-	RenderFinishedMessageType
+	RenderFinishedMessageType,
+	SoundMessageType
 };
 
 /*========================================================================================
@@ -124,8 +129,6 @@ class RenderFinishedMessageContent : public BaseMessageContent
 	
 };
 
-//*****FILE MESSAGES
-
 class PhysicsCallMessageContent: public BaseMessageContent
 {
 	public:
@@ -136,11 +139,26 @@ class PhysicsCallMessageContent: public BaseMessageContent
 	PhysicsCallMessageContent(std::string s) { contentVar = s; }
 };
 
-class PhysicsInitializeContent : public BaseMessageContent
+class PhysicsAccelerateContent : public BaseMessageContent
+{
+public:
+	GameObject *object;
+	GLfloat amountFast, amountSlow, turningDegree;
+	bool _isDrifting;
+	bool _wasDrifting;
+};
+
+class InputInitializeContent : public BaseMessageContent
 {
 	public:
 		GameObject* camera;
 		GameObject* player;
+};
+
+class InputButtonDownContent : public BaseMessageContent 
+{
+public:
+	SDL_Event ev;
 };
 
 class FileLoadMessageContent : public BaseMessageContent
@@ -175,11 +193,34 @@ public:
 	std::shared_ptr<SDL_Surface> image;
 };
 
+//*****INPUT MESSAGES
+
 class InputMessageContent : public BaseMessageContent
 {
 public:
 	INPUT_TYPES type;
 	float lookX, lookY;
+};
+
+
+
+//*****SOUND MESSAGES
+
+enum class S_TYPE
+{
+	playSound,
+	playMusic,
+	stopMusic
+};
+
+class SoundMessageContent: public BaseMessageContent
+{
+public:
+	S_TYPE subType;
+	std::string name;
+
+private:
+
 };
 
 #endif

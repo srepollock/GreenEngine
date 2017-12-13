@@ -46,8 +46,6 @@ void FileEngine::loop()
 				_urgentMessageQueue.pop();
 				_urgentMessageQueueMutex_p->unlock();
 				HandleMessage(msg);
-				
-
 			}
 			else if (!_messageQueue.empty())
 			{
@@ -57,7 +55,6 @@ void FileEngine::loop()
 				_messageQueue.pop();
 				_messageQueueMutex_p->unlock();
 				HandleMessage(msg);
-				
 			}
 			else
 			{
