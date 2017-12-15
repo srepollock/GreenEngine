@@ -1,3 +1,0 @@
-[submodule "src/UnitTestSystem/Catch2"]
-	path = src/UnitTestSystem/Catch2
-	url = https://github.com/catchorg/Catch2.git
