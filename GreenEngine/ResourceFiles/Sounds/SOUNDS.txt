@@ -1,3 +1,0 @@
-Sound effects and music go here. SDL_mixer supports OGG and WAV. OGG is preferable.
-
-Did you remember to add credits to CREDITS?
