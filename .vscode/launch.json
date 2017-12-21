@@ -1,0 +1,44 @@
+{
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Debug",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceRoot}/build/debug.out",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceRoot}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "lldb",
+                "preLaunchTask": "GreenEngineDebugBuild"
+            },
+            {
+                "name": "Release",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceRoot}/build/release.out",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceRoot}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "lldb",
+                "preLaunchTask": "GreenEngineReleaseBuild"
+            },
+            {
+                "name": "Unit Tests",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceRoot}/build/unittest.out",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceRoot}",
+                "environment": [],
+                "externalConsole": true,
+                "MIMode": "lldb",
+                "preLaunchTask": "UnitTestBuild"
+            }
+        ]
+    }

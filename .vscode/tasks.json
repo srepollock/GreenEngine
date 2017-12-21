@@ -1,0 +1,75 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "GreenEngineDebugBuild",
+            "type": "shell",
+            "osx" : {
+                "command": "clang++",
+                "args": [
+                    "-std=c++11",
+                    "${workspaceRoot}/GreenEngine/GameEngine/SourceFiles/*.cpp",
+                    "-I${workspaceRoot}/GreenEngine/GameEngine/HeaderFiles",
+                    "-framework OpenGL", 
+                    "-lGLEW", 
+                    "-lSDL2",
+                    "-lSDL2_image",
+                     "-g",
+                     "-o debug.out"
+                ]
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "GreenEngineReleaseBuild",
+            "type": "shell",
+            "osx" : {
+                "command": "clang++",
+                "args": [
+                    "-std=c++11",
+                    "${workspaceRoot}/GreenEngine/GameEngine/SourceFiles/*.cpp",
+                    "-I${workspaceRoot}/GreenEngine/GameEngine/HeaderFiles",
+                    "-framework OpenGL", 
+                    "-lGLEW", 
+                    "-lSDL2",
+                    "-lSDL2_image",
+                    "-o release.out"
+                ]
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "UnitTestBuild",
+            "type": "shell",
+            "osx" : {
+                "command": "clang++",
+                "args": [
+                    "-std=c++11",
+                    "${workspaceRoot}/src/UnitTestSystem/main.cpp",
+                    "${workspaceRoot}/src/Entities/*.cpp",
+                    "${workspaceRoot}/src/Entities/Components/*.cpp",
+                    "-I${workspaceRoot}/src/UnitTestSystem/Catch2/include/",
+                    "-I${workspaceRoot}/src/Engine/",
+                    "-I${workspaceRoot}/src/FileSystem/",
+                    "-I${workspaceRoot}/src/RenderSystem/",
+                    "-I${workspaceRoot}/src/Entities/",
+                    "-I${workspaceRoot}/src/Entities/Components/",
+                     "-g",
+                     "-o build/unittest.out"
+                ]
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
