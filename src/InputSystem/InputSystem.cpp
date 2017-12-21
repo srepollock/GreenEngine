@@ -1,6 +1,6 @@
-#include "InputEngine.h"
+#include "InputSystem.h"
 
-InputEngine::InputEngine() {
+InputSystem::InputSystem() {
 	subscribe(MESSAGE_TYPE::InputInitializeCallType);
 	subscribe(MESSAGE_TYPE::InputButtonDownCallType);
 	SDL_Init(SDL_INIT_GAMECONTROLLER);
@@ -22,7 +22,7 @@ InputEngine::InputEngine() {
 	}
 }
 
-void InputEngine::setUpInput() 
+void InputSystem::setUpInput() 
 {
 	
 	while (!_messageQueue.empty()) 
@@ -47,7 +47,7 @@ void InputEngine::setUpInput()
 	}
 }
 
-InputEngine::~InputEngine() 
+InputSystem::~InputSystem() 
 {
 	if (gameController != NULL)
 	{
@@ -55,7 +55,7 @@ InputEngine::~InputEngine()
 	}
 }
 
-void InputEngine::buttonEventHandler(SDL_Event ev)
+void InputSystem::buttonEventHandler(SDL_Event ev)
 {
 	switch (ev.cbutton.button)
 	{
@@ -94,7 +94,7 @@ void InputEngine::buttonEventHandler(SDL_Event ev)
 	}
 }
 
-void InputEngine::axisEventHandler(GLfloat X, GLfloat Y, INPUT_TYPES type)
+void InputSystem::axisEventHandler(GLfloat X, GLfloat Y, INPUT_TYPES type)
 {
 	switch (type) {
 	case INPUT_TYPES::LOOK_AXIS:
@@ -230,7 +230,7 @@ void InputEngine::axisEventHandler(GLfloat X, GLfloat Y, INPUT_TYPES type)
 	}
 }
 
-void InputEngine::checkAxis(SDL_GameControllerAxis x, SDL_GameControllerAxis y, INPUT_TYPES type) 
+void InputSystem::checkAxis(SDL_GameControllerAxis x, SDL_GameControllerAxis y, INPUT_TYPES type) 
 {
 	int16_t degreeX = SDL_GameControllerGetAxis(gameController, x);
 	int16_t degreeY = SDL_GameControllerGetAxis(gameController, y);
@@ -246,7 +246,7 @@ void InputEngine::checkAxis(SDL_GameControllerAxis x, SDL_GameControllerAxis y, 
 	axisEventHandler(xAmount, yAmount, type);
 }
 
-void InputEngine::checkInput(GLfloat deltaTime)
+void InputSystem::checkInput(GLfloat deltaTime)
 {
 	_deltaTime = deltaTime; 
 	while (!_messageQueue.empty())

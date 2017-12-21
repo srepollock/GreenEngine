@@ -10,12 +10,12 @@ const int_least64_t CYCLE_DELAY_MS_CONST = 10;
 /// <summary>
 /// Threaded file loading class that integrates with messaging system
 /// </summary>
-class FileEngine : MessageReceiver
+class FileSystem : MessageReceiver
 {
 public:	
 	void start();
-	FileEngine();
-	~FileEngine();
+	FileSystem();
+	~FileSystem();
 
 	static size_t HashFilePath(std::string path, bool relative);
 private:

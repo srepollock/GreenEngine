@@ -15,7 +15,7 @@
 #include <queue>
 #include <atomic>
 
-#include "RenderEngine.h"
+#include "RenderSystem.h"
 
 #include "GlobalPrefs.h"
 #include "FileEngine.h"
@@ -42,9 +42,9 @@
 const int_least64_t IDLE_DELAY_CONST = 10;
 
 /// <summary>
-/// Actual RenderEngine implementation, using PIMPL pattern for a modicum of isolation
+/// Actual RenderSystem implementation, using PIMPL pattern for a modicum of isolation
 /// </summary>
-class RenderEngineImplementation
+class RenderSystemImplementation
 {
 public:
 
@@ -53,7 +53,7 @@ public:
 	/// Does nothing
 	/// (runs on game engine thread)
 	/// </summary>
-	RenderEngineImplementation()
+	RenderSystemImplementation()
 	{
 	}
 
@@ -93,12 +93,12 @@ public:
 
 		//spawn thread
 		_isRunning = true;
-		_renderThread_p = new std::thread(&RenderEngineImplementation::loop, this);
+		_renderThread_p = new std::thread(&RenderSystemImplementation::loop, this);
 	}
 
 	/// <summary>
 	/// Implementation update method
-	/// Since RenderEngine is totally asynchronous, this does nothing
+	/// Since RenderSystem is totally asynchronous, this does nothing
 	/// (runs on game engine thread)
 	/// </summary>
 	void update()
@@ -110,7 +110,7 @@ public:
 	/// Kills render thread, cleans up message handlers and queues
 	/// (runs on game engine thread)
 	/// </summary>
-	~RenderEngineImplementation()
+	~RenderSystemImplementation()
 	{
 		//destructor
 
@@ -277,7 +277,7 @@ private:
 	{
 		//initial setup: run once
 
-		SDL_Log("RenderEngine thread started!");
+		SDL_Log("RenderSystem thread started!");
 
 		setupStructuresOnThread();
 		setupGLOnThread();
@@ -286,7 +286,7 @@ private:
 		//for testing
 		_state = RendererState::idle;
 
-		//loop: on RenderEngine thread
+		//loop: on RenderSystem thread
 		while (_isRunning)
 		{
 			//doLoad, doRender/doImmediateLoad, doUnload
@@ -331,7 +331,7 @@ private:
 		cleanupGLOnThread();
 		cleanupStructuresOnThread();
 
-		SDL_Log("RenderEngine thread halted!");
+		SDL_Log("RenderSystem thread halted!");
 	}
 
 	/// <summary>
@@ -2168,22 +2168,22 @@ private:
 
 //Base class implementations below: just passes through because PIMPL
 
-RenderEngine::RenderEngine()
+RenderSystem::RenderSystem()
 {
-	_impl = new RenderEngineImplementation();
+	_impl = new RenderSystemImplementation();
 }
 
-void RenderEngine::start()
+void RenderSystem::start()
 {
 	_impl->start();
 }
 
-void RenderEngine::update()
+void RenderSystem::update()
 {
 	_impl->update();
 }
 
-RenderEngine::~RenderEngine()
+RenderSystem::~RenderSystem()
 {
 	delete(_impl);
 };

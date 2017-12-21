@@ -5,13 +5,13 @@
 #include <SDL.h>
 #endif
 #include <thread>
-class AIEngine {
+class AISystem {
 public:
     std::thread* start();
     void update();
     void stop();
-    AIEngine();
-    ~AIEngine();
+    AISystem();
+    ~AISystem();
 private:
     bool _running = false;
     void loop();

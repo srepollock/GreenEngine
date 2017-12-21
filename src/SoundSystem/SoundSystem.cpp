@@ -1,6 +1,6 @@
-#include "SoundEngine.h"
+#include "SoundSystem.h"
 
-SoundEngine::SoundEngine()
+SoundSystem::SoundSystem()
 {
 	subscribe(MESSAGE_TYPE::SoundMessageType);
 	SDL_Init(SDL_INIT_AUDIO);
@@ -31,7 +31,7 @@ SoundEngine::SoundEngine()
 	gameSoundEffects.emplace("SFX06", Mix_LoadWAV((basePath + "VehicleDestroyed.wav").c_str())); // Vehicle Destroyed
 }
 
-SoundEngine::~SoundEngine() 
+SoundSystem::~SoundSystem() 
 {
 	//Music
 	Mix_FreeMusic(gameSoundtracks.at("Music01"));
@@ -52,7 +52,7 @@ SoundEngine::~SoundEngine()
 	//SDL_Quit();
 }
 
-void SoundEngine::loop()
+void SoundSystem::loop()
 {
 	if (!_urgentMessageQueue.empty())
 	{
@@ -74,7 +74,7 @@ void SoundEngine::loop()
 	}
 }
 
-void SoundEngine::HandleMessage(std::shared_ptr<Message> inBaseMessage)
+void SoundSystem::HandleMessage(std::shared_ptr<Message> inBaseMessage)
 {
 	MESSAGE_TYPE contentType = inBaseMessage->getType();
 
@@ -85,7 +85,7 @@ void SoundEngine::HandleMessage(std::shared_ptr<Message> inBaseMessage)
 	}
 }
 
-void SoundEngine::SoundMessage(SoundMessageContent inMessageContent)
+void SoundSystem::SoundMessage(SoundMessageContent inMessageContent)
 {
 	switch (inMessageContent.subType)
 	{

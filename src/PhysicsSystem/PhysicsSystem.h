@@ -1,5 +1,5 @@
 /*===================================================================================*//**
-	PhysicsEngine
+	PhysicsSystem
 
 	The physics engine for the RACE game engine.
     
@@ -11,8 +11,8 @@
 	@version 0.0.0
 	@file
 	
-	@see PhysicsEngine
-	@see PhysicsEngine.cpp
+	@see PhysicsSystem
+	@see PhysicsSystem.cpp
 	
 *//*====================================================================================*/
 
@@ -50,15 +50,15 @@
 
 
 /*========================================================================================
-	PhysicsEngine	
+	PhysicsSystem	
 ========================================================================================*/
 /**
 	The physics engine for the RACE game engine.
 	
-	@see PhysicsEngine
-	@see PhysicsEngine.cpp
+	@see PhysicsSystem
+	@see PhysicsSystem.cpp
 */
-class PhysicsEngine : public MessageReceiver
+class PhysicsSystem : public MessageReceiver
 {
     /*------------------------------------------------------------------------------------
 		Instance Fields
@@ -75,9 +75,9 @@ class PhysicsEngine : public MessageReceiver
 		Constructors and Destructors
     ------------------------------------------------------------------------------------*/
     public:
-		PhysicsEngine();
+		PhysicsSystem();
 
-		~PhysicsEngine();
+		~PhysicsSystem();
 
 	/*------------------------------------------------------------------------------------
 		Instance Getter Methods

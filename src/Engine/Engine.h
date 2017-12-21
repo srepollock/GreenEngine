@@ -12,7 +12,12 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
-#include "EngineHeaders.h"
+#include "FileSystem.h"
+#include "RenderSystem.h"
+#include "PhysicsSystem.h"
+#include "AISystem.h"
+#include "InputSystem.h"
+#include "SoundSystem.h"
 #include "ComponentHeaders.h"
 #include "GameObject.h"
 #include "Scene.h"
@@ -29,12 +34,12 @@ public:
 	void doReads();
     std::thread *_engineThread_p;
 private:
-	FileEngine *_fileEngine_p;
-    RenderEngine *_renderEngine_p;
-    PhysicsEngine *_physicsEngine_p;
-    AIEngine *_aiEngine_p;
-    InputEngine *_inputEngine_p;
-    SoundEngine *_soundEngine_p;	
+	FileSystem *_fileSystem_p;
+    RenderSystem *_renderSystem_p;
+    PhysicsSystem *_physicsSystem_p;
+    AISystem *_aiSystem_p;
+    InputSystem *_inputSystem_p;
+    SoundSystem *_soundSystem_p;	
     std::thread *_physicsThread_p;
 	//std::thread *_renderThread_p;
     //std::thread *_aiThread_p;

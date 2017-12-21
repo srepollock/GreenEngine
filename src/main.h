@@ -21,3 +21,9 @@
 
 extern SDL_Window *g_window_p;
 extern SDL_GLContext g_context;
+
+/**
+ * User Preferences
+ */
+
+#define GAME_NAME_CONST "Race"

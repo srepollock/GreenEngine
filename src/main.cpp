@@ -1,9 +1,9 @@
 #include "main.h" 
 #include "Engine.h"
 #include "GlobalPrefs.h"
-#include "InputEngine.h"
+#include "InputSystem.h"
 #include "MessagingSystem.h"
-#include "SoundEngine.h"
+#include "SoundSystem.h"
 
 SDL_Window *g_window_p;
 SDL_GLContext g_context;
@@ -17,18 +17,19 @@ std::thread* engineThread_p;
 /// <return>Status code on application exit.</return>
 int main(int argc, char ** argv) {
 	SDL_Init(SDL_INIT_VIDEO);
-	InputEngine *ie = new InputEngine();
-	SoundEngine *se = new SoundEngine();
-	g_window_p = SDL_CreateWindow("RACE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GlobalPrefs::windowWidth, GlobalPrefs::windowHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
+	InputSystem *ie = new InputSystem(); // Start InputSystem
+	SoundEngine *se = new SoundSystem();
+	g_window_p = SDL_CreateWindow(
+		GAME_NAME_CONST, 
+		SDL_WINDOWPOS_CENTERED, 
+		SDL_WINDOWPOS_CENTERED, 
+		GlobalPrefs::windowWidth, 
+		GlobalPrefs::windowHeight, 
+		SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI
+	);
 	MessagingSystem::instance().start();
 	Engine *e = new Engine();
 	engineThread_p = e->start();
-	SoundMessageContent *content = new SoundMessageContent;
-	content->name = "Music02";
-	content->subType = S_TYPE::playMusic;
-	std::shared_ptr<Message> myMessage = std::make_shared<Message>(Message(MESSAGE_TYPE::SoundMessageType));
-	myMessage->setContent(content);
-	MessagingSystem::instance().postMessage(myMessage);
 	bool quit = false;
 	SDL_Event ev;
 	uint32_t ticksAtLast = SDL_GetTicks();

@@ -1,12 +1,12 @@
 #pragma once
 
 //forward declaration of class makes PIMPL possible
-class RenderEngineImplementation;
+class RenderSystemImplementation;
 
-class RenderEngine {
+class RenderSystem {
 public:
 	/// <summary>
-	/// Starts the RenderEngine, creates the rendering thread, and switches OpenGL context
+	/// Starts the RenderSystem, creates the rendering thread, and switches OpenGL context
 	/// </summary>
     void start();
 
@@ -15,9 +15,9 @@ public:
 	/// </summary>
     void update();
 
-    RenderEngine();
-    ~RenderEngine();
+    RenderSystem();
+    ~RenderSystem();
 private:
-	RenderEngineImplementation *_impl;
+	RenderSystemImplementation *_impl;
 	
 };

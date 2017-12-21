@@ -21,10 +21,10 @@
 #include <SDL.h>
 #endif
 
-class InputEngine : public MessageReceiver {
+class InputSystem : public MessageReceiver {
 public:
-    InputEngine();
-    ~InputEngine();
+    InputSystem();
+    ~InputSystem();
 	void buttonEventHandler(SDL_Event);
 	void axisEventHandler(GLfloat, GLfloat, INPUT_TYPES);
 	void checkAxis(SDL_GameControllerAxis, SDL_GameControllerAxis, INPUT_TYPES);

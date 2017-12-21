@@ -12,10 +12,10 @@
 #include "Message.h"
 #include "MessagingSystem.h"
 
-class SoundEngine : MessageReceiver {
+class SoundSystem : MessageReceiver {
 public:
-    SoundEngine();
-    ~SoundEngine();
+    SoundSystem();
+    ~SoundSystem();
 	void loop();
 
 private:

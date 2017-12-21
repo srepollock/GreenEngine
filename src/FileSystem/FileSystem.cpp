@@ -1,15 +1,15 @@
-#include "FileEngine.h"
+#include "FileSystem.h"
 #include "Message.h"
 #include "MessageTypes.h"
 #include "FileHelper.h"
 #include "MessagingSystem.h"
 
-FileEngine::FileEngine()
+FileSystem::FileSystem()
 {
 	//we do all the hard work in start()
 }
 
-void FileEngine::start()
+void FileSystem::start()
 {
 	//subscribe to messages
 	subscribe(MESSAGE_TYPE::FileLoadMessageType);
@@ -17,10 +17,10 @@ void FileEngine::start()
 
 	//start loop
 	_isRunning = true;
-	_thread_p = new std::thread(&FileEngine::loop, this);
+	_thread_p = new std::thread(&FileSystem::loop, this);
 }
 
-FileEngine::~FileEngine()
+FileSystem::~FileSystem()
 {
 	_isRunning = false;
 	_thread_p->join();
@@ -30,7 +30,7 @@ FileEngine::~FileEngine()
 	unsubscribe(MESSAGE_TYPE::FileLoadImageMessageType);
 }
 
-void FileEngine::loop()
+void FileSystem::loop()
 {
 	//do setup on thread
 
@@ -71,7 +71,7 @@ void FileEngine::loop()
 
 }
 
-void FileEngine::HandleMessage(std::shared_ptr<Message> inBaseMessage)
+void FileSystem::HandleMessage(std::shared_ptr<Message> inBaseMessage)
 {	
 	MESSAGE_TYPE contentType = inBaseMessage->getType();
 	switch (contentType)
@@ -94,7 +94,7 @@ void FileEngine::HandleMessage(std::shared_ptr<Message> inBaseMessage)
 	}
 }
 
-void FileEngine::HandleNormalMessage(FileLoadMessageContent inMessage)
+void FileSystem::HandleNormalMessage(FileLoadMessageContent inMessage)
 {
 	size_t hash = 0;
 	std::string content = std::string();
@@ -122,7 +122,7 @@ void FileEngine::HandleNormalMessage(FileLoadMessageContent inMessage)
 	MessagingSystem::instance().postMessage(message);
 }
 
-void FileEngine::HandleImageMessage(FileLoadImageMessageContent inMessage)
+void FileSystem::HandleImageMessage(FileLoadImageMessageContent inMessage)
 {
 	size_t hash = 0;
 	SDL_Surface *content;
@@ -150,7 +150,7 @@ void FileEngine::HandleImageMessage(FileLoadImageMessageContent inMessage)
 	MessagingSystem::instance().postMessage(message);
 }
 
-size_t FileEngine::HashFilePath(std::string path, bool relative)
+size_t FileSystem::HashFilePath(std::string path, bool relative)
 {
 	std::string prefix;
 	if (relative)

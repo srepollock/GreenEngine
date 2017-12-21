@@ -5,8 +5,8 @@
 #include <vector>
 #ifndef FILE_CONSTANTS
 #define FILE_CONSTANTS
-const std::string MODEL_BASEPATH_CONST = "ResourceFiles/Models/";
-const std::string TEXTURE_BASEPATH_CONST = "ResourceFiles/Textures/";
+const std::string MODEL_BASEPATH_CONST = "bin/Models/";
+const std::string TEXTURE_BASEPATH_CONST = "bin/Textures/";
 const std::string MODEL_EXTENSION_CONST = ".obj";
 const std::string TEXTURE_EXTENSION_CONST = ".png";
 #endif

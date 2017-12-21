@@ -1,5 +1,5 @@
 /*===================================================================================*//**
-	PhysicsEngine
+	PhysicsSystem
 	
 	The physics engine for the RACE game engine.
     
@@ -11,15 +11,15 @@
 	@version 0.0.0
 	@file
 	
-	@see PhysicsEngine
-	@see PhysicsEngine.h
+	@see PhysicsSystem
+	@see PhysicsSystem.h
 	
 *//*====================================================================================*/
 
 /*========================================================================================
 	Dependencies
 ========================================================================================*/
-#include "PhysicsEngine.h"
+#include "PhysicsSystem.h"
 
 /*----------------------------------------------------------------------------------------
 	Constructors and Destructors
@@ -27,7 +27,7 @@
 ///
 ///	Physics engine constructor.
 ///
-PhysicsEngine::PhysicsEngine()
+PhysicsSystem::PhysicsSystem()
 {
 	subscribe(MESSAGE_TYPE::PhysicsCallMessageType);
 	subscribe(MESSAGE_TYPE::PhysicsAccelerateCallType);
@@ -36,7 +36,7 @@ PhysicsEngine::PhysicsEngine()
 ///
 ///	Physics engine destructor.
 ///
-PhysicsEngine::~PhysicsEngine()
+PhysicsSystem::~PhysicsSystem()
 {
 	SDL_Log("%s", "Running Physics::Destructor");
 }
@@ -57,20 +57,20 @@ PhysicsEngine::~PhysicsEngine()
 ///
 ///	Starts the physics engine loop on its own thread and returns a pointer to the thread.
 ///
-std::thread* PhysicsEngine::start()
+std::thread* PhysicsSystem::start()
 {
 	if (!_running)
 	{
 		_running = true;
 	}
 
-	return new std::thread(&PhysicsEngine::loop, this);
+	return new std::thread(&PhysicsSystem::loop, this);
 }
 
 ///
 ///	The physics engine loop.
 ///
-void PhysicsEngine::loop()
+void PhysicsSystem::loop()
 {
 	while (_running) {
 		_urgentMessageQueueMutex_p->lock();
@@ -113,7 +113,7 @@ void PhysicsEngine::loop()
 	SDL_Log("Physics::Out of loop");
 };
 
-void PhysicsEngine::checkMessage(std::shared_ptr<Message> myMessage) 
+void PhysicsSystem::checkMessage(std::shared_ptr<Message> myMessage) 
 {
 
 	switch (myMessage->getType()) {
@@ -205,7 +205,7 @@ void PhysicsEngine::checkMessage(std::shared_ptr<Message> myMessage)
 	}
 };
 
-void PhysicsEngine::generalPhysicsCall(GameObject* go) 
+void PhysicsSystem::generalPhysicsCall(GameObject* go) 
 {
 	if (go->hasComponent<RigidBodyComponent*>()) 
 	{
@@ -224,7 +224,7 @@ void PhysicsEngine::generalPhysicsCall(GameObject* go)
 	}
 };
 
-void PhysicsEngine::applyAcceleration(GameObject *go, RigidBodyComponent *rc) 
+void PhysicsSystem::applyAcceleration(GameObject *go, RigidBodyComponent *rc) 
 {
 	if (rc->getVelocity().magnitude() < rc->getMaxVelocity()) 
 	{
@@ -234,7 +234,7 @@ void PhysicsEngine::applyAcceleration(GameObject *go, RigidBodyComponent *rc)
 	angularAccelerate(rc);
 };
 
-void PhysicsEngine::adjustForces(GameObject *go, RigidBodyComponent *rc) 
+void PhysicsSystem::adjustForces(GameObject *go, RigidBodyComponent *rc) 
 {
 	Vector3 dragVector = -rc->getVelocity().normalize();
 	Vector3 newForce = rc->getForce() + (dragVector * (rc->getVelocity().magnitude() *
@@ -256,9 +256,9 @@ void PhysicsEngine::adjustForces(GameObject *go, RigidBodyComponent *rc)
 /**
  *	Stops the physics engine.
  */
-void PhysicsEngine::stop() {};
+void PhysicsSystem::stop() {};
 
-void PhysicsEngine::flagLoop() 
+void PhysicsSystem::flagLoop() 
 {
 	_running = false;
 };
@@ -268,13 +268,13 @@ void PhysicsEngine::flagLoop()
  *  Accelerate the game object. The amount should be modified by the delta time.
  *  </summary>
  */
-void PhysicsEngine::linearAccelerate(GameObject* go, RigidBodyComponent* rbc)
+void PhysicsSystem::linearAccelerate(GameObject* go, RigidBodyComponent* rbc)
 {
 	rbc->setVelocity(go->_transform._forward * rbc->getVelocity().magnitude() + rbc->getAccelerationVector() * _deltaTime);
 };
 
 
-void PhysicsEngine::angularAccelerate(RigidBodyComponent* rbc) 
+void PhysicsSystem::angularAccelerate(RigidBodyComponent* rbc) 
 {
 	//rbc->setAngularAccel();
 	rbc->_angularVel += rbc->getAngularAccel() * _deltaTime;
@@ -285,13 +285,13 @@ void PhysicsEngine::angularAccelerate(RigidBodyComponent* rbc)
  * Accelerate the game object. Each axis should be modified by the delta time.
  * </summary>
  */
-void PhysicsEngine::accelerate(GameObject *go, GLfloat x, GLfloat y, GLfloat z)
+void PhysicsSystem::accelerate(GameObject *go, GLfloat x, GLfloat y, GLfloat z)
 {
 	//go->getComponent<RigidBodyComponent*>()->getVelocity() += Vector3(x, y, z) * _deltaTime;
 	//go->getComponent<RigidBodyComponent*>()->setSpeed(go->getComponent<RigidBodyComponent*>()->getAccNumber() * _deltaTime);
 };
 
-Vector3 PhysicsEngine::getAngleFromTurn(GameObject *go, GLfloat tireDegree)
+Vector3 PhysicsSystem::getAngleFromTurn(GameObject *go, GLfloat tireDegree)
 {
 	GLfloat objectVelocity = go->getComponent<RigidBodyComponent*>()->getVelocity().magnitude();
 
@@ -328,14 +328,14 @@ Vector3 PhysicsEngine::getAngleFromTurn(GameObject *go, GLfloat tireDegree)
 	return go->_transform._up * omega;
 };
 
-void PhysicsEngine::turnGameObject(GameObject *go)
+void PhysicsSystem::turnGameObject(GameObject *go)
 {
 	Vector3 angularVelocity = getAngleFromTurn(go, go->getComponent<RigidBodyComponent*>()->getTurningDegree());
 	if (go->getComponent<RigidBodyComponent*>()->getVelocity().magnitude() > 0)
 		go->rotate(angularVelocity, 0.5 * _deltaTime); // angularVelocity * deltaTime = current angle
 }
 
-void PhysicsEngine::collisionDetection(std::map<std::string, GameObject*> worldObj, GameObject * go)
+void PhysicsSystem::collisionDetection(std::map<std::string, GameObject*> worldObj, GameObject * go)
 {
 	if (go->hasComponent<BoxColliderComponent*>()) 
 	{
@@ -360,7 +360,7 @@ void PhysicsEngine::collisionDetection(std::map<std::string, GameObject*> worldO
 	}
 };
 
-bool PhysicsEngine::checkForCollision(GameObject *coll1, GameObject *coll2) 
+bool PhysicsSystem::checkForCollision(GameObject *coll1, GameObject *coll2) 
 {
 	BoxColliderComponent *boxColl = coll1->getComponent<BoxColliderComponent*>();
 	BoxColliderComponent *boxColl2 = coll2->getComponent<BoxColliderComponent*>();

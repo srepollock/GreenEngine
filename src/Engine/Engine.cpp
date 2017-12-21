@@ -17,37 +17,37 @@ std::thread* Engine::start() {
 	subscribe(MESSAGE_TYPE::PhysicsReturnCall);
 	subscribe(MESSAGE_TYPE::SceneDoneLoadType);
     // Create the other engines, or at least get pointer to them
-	_fileEngine_p = new FileEngine();
-	if (_fileEngine_p == nullptr) {
+	_fileSystem_p = new FileSystem();
+	if (_fileSystem_p == nullptr) {
 		std::cout << ErrorHandler::getErrorString(1) << std::endl;
 	}
-    _renderEngine_p = new RenderEngine();
-    if (_renderEngine_p == nullptr) {
+    _renderSystem_p = new RenderSystem();
+    if (_renderSystem_p == nullptr) {
         std::cout << ErrorHandler::getErrorString(1) << std::endl;
     }
-    _physicsEngine_p = new PhysicsEngine();
-    if (_physicsEngine_p == nullptr) {
+    _physicsSystem_p = new PhysicsSystem();
+    if (_physicsSystem_p == nullptr) {
         std::cout << ErrorHandler::getErrorString(1) << std::endl;
     }
-	_inputEngine_p = new InputEngine();
-	if (_inputEngine_p == nullptr) {
+	_inputSystem_p = new InputSystem();
+	if (_inputSystem_p == nullptr) {
 		std::cout << ErrorHandler::getErrorString(1) << std::endl;
 	}
-    /**_aiEngine_p = new AIEngine();
-    if (_aiEngine_p == nullptr) {
+    /**_aiSystem_p = new AISystem();
+    if (_aiSystem_p == nullptr) {
         std::cout << ErrorHandler::getErrorString(1) << std::endl;
     }**/
-    _soundEngine_p = new SoundEngine();
+    _soundSystem_p = new SoundSystem();
 
-    if (_soundEngine_p == nullptr) {
+    if (_soundSystem_p == nullptr) {
         std::cout << ErrorHandler::getErrorString(1) << std::endl;
     }
     try {
-		_fileEngine_p->start();
-        _renderEngine_p->start(); // Render handles it's own thread
-        _physicsThread_p = _physicsEngine_p->start();
-        //_aiThread_p = _aiEngine_p->start();
-        //_soundEngine_p->start();		
+		_fileSystem_p->start();
+        _renderSystem_p->start(); // Render handles it's own thread
+        _physicsThread_p = _physicsSystem_p->start();
+        //_aiThread_p = _aiSystem_p->start();
+        //_soundSystem_p->start();		
     } catch (std::exception e) {
         std::cout << ErrorHandler::getErrorString(1) << std::endl;
     }
@@ -62,7 +62,7 @@ std::thread* Engine::start() {
 
 	_sceneObj = new Scene();
 	while (checkMessages());
-	_inputEngine_p->setUpInput();
+	_inputSystem_p->setUpInput();
 
 	ticksAtLast = SDL_GetTicks();
 
@@ -98,7 +98,7 @@ void Engine::update() {
 	if (currentTime > ticksAtLast + 1000 / FRAMES_PER_SECOND)
 	{
 		float delta = (((float_t)(currentTime - ticksAtLast)) / 1000);
-		_inputEngine_p->checkInput(delta);
+		_inputSystem_p->checkInput(delta);
 		if (_sceneObj != nullptr) {
 
 			doWrites(delta);
@@ -139,18 +139,18 @@ void Engine::loop() {
 /// 
 void Engine::stop() 
 {
-	_inputEngine_p->~InputEngine();
-	//_aiEngine_p->~AIEngine();
-	_physicsEngine_p->flagLoop();
-	_physicsEngine_p->~PhysicsEngine();
-    _renderEngine_p->~RenderEngine();
+	_inputSystem_p->~InputSystem();
+	//_aiSystem_p->~AISystem();
+	_physicsSystem_p->flagLoop();
+	_physicsSystem_p->~PhysicsSystem();
+    _renderSystem_p->~RenderSystem();
 	
-    _fileEngine_p->~FileEngine();
+    _fileSystem_p->~FileSystem();
 
 	_physicsThread_p->join();
 	delete(_sceneObj);
-    //_physicsEngine_p->stop();
-    //_aiEngine_p->stop();
+    //_physicsSystem_p->stop();
+    //_aiSystem_p->stop();
 }
 
 void Engine::flagLoop() 
