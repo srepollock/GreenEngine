@@ -278,3 +278,7 @@ build/*
 *.out*
 *.swp
 *.out.dSYM/*
+
+# GreenEngine
+src/Project/*.*
+!src/Project/*.md
