@@ -1,2 +1,2 @@
-# GreenEngine
+# Green Engine
 A C++ game engine
